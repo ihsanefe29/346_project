@@ -7,13 +7,12 @@ import {prisma} from "../../../prisma/db";
 export async function GET(request) {
     try {
         const auth = request.headers.get("authorization");
-
         if (!auth || auth.startsWith("Bearer ") === false) {
             return NextResponse.json({error: "Unauthorized"}, {status: 401});
         }
 
         const authPayload = verifyToken(auth.split(" ")[1]);
-        console.log("authPayload: ", authPayload);
+
 
         if (!authPayload) {
             return NextResponse.json({error: "Unauthorized"}, {status: 401});
@@ -23,6 +22,7 @@ export async function GET(request) {
             message:
                 "Hi there! You are authenticated. Your username is " +
                 authPayload.username,
+            user: {userId: authPayload.userId, email: authPayload.email, role: authPayload.role},
             status: 200
         });
     }
@@ -56,5 +56,5 @@ export async function POST(request) {
         const newToken = generateToken(auth_User);
         return NextResponse.json({ newToken }, { status: 200 });
     }
-    catch (error) {return helper.errors.INTERNAL_SERVER_ERROR();}
+    catch (error) {return helper.errors.INTERNAL_SERVER_ERROR(error);}
 }

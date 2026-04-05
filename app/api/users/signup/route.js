@@ -39,12 +39,10 @@ export async function POST(request) {
         }
 
         const users = await prisma.user.findMany();
-        console.log("ALL USERS:", users);
 
         existingUser = await prisma.user.findUnique(
             {where: {email_role: {email:email, role: role}}}
         )
-        console.log(existingUser);
 
         if(existingUser){
             return NextResponse.json(
@@ -69,11 +67,9 @@ export async function POST(request) {
             },
         });
 
-        return NextResponse.json(user);
+        return NextResponse.json(user, {status:200});
     }
     catch (error) {
-        console.error("SIGNUP ERROR:", error);
-        console.error("ERROR CODE:", error?.code);
-        console.error("ERROR META:", error?.meta);
-        return helper.errors.INTERNAL_SERVER_ERROR();}
+
+        return helper.errors.INTERNAL_SERVER_ERROR(error);}
 }

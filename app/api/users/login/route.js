@@ -27,7 +27,6 @@ export async function POST(request) {
     try {
         const token = generateToken({userId: user.id, username: user.username, role: user.role});
         const refresh_token = generateRefreshToken({userId: user.id});
-        console.log("token", refresh_token);
         await prisma.user.update({
             where: { id: user.id },
             data: { refresh_token },
