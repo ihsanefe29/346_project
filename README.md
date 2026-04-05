@@ -26,7 +26,7 @@ Setup Instructions
 
 - DATABASE_URL="file:./dev.db"
 - JWT_SECRET="your_secret_key"
--REFRESH_SECRET="..."
+- REFRESH_SECRET="..."
 
 4. Database Setup (Prisma)
 - npx prisma migrate dev
@@ -51,30 +51,62 @@ Register
 Request Body:
 {
   "username": "user1",
-  "password": "123456",
+  "name": "user",
   "email": "user@test.com",
+  "password": "12345678",
   "role": "ATTENDEE"
 }
 
 Login
 - POST /api/users/login
+Request Body:
+  {
+  "username": "user1",
+  "password": "12345678"
+  }
 
 Response:
 {
-  "accessToken": "token",
-  "refreshToken": "token"
+  "token": "token",
+  "refresh_token": "token"
 }
 
 Check auth
 - GET /api/users
 
+Request Header:
+  {
+  "Authorization": "Bearer token"
+  }
+
+
 Get new access token
 - POST /api/users
+
+Request Header:
+{
+"Authorization": "Bearer refresh_token"
+}
+
 
 Events
 
 Create Event (Organizer)
 - POST /api/events
+
+Request Header:
+{
+"Authorization": "Bearer token"
+}
+
+Request Body:
+{
+"title": "Fall Concert",
+"description": "Live music on campus",
+"dateTime": "09/15/2019",
+"capacity": 500
+}
+
 
 Get All Events
 - GET /api/events
@@ -83,27 +115,78 @@ Get Event by ID
 - GET /api/events/:id
 
 Update Event (Organizer)
-- PUSH /api/events/:id
+- POST /api/events/:id
+
+Request Header:
+{
+"Authorization": "Bearer token"
+}
+
+Request Body:
+{
+"title": "Fall Concert",
+"description": "Live music on campus",
+"dateTime": "09/15/2019",
+"capacity": 500
+}
+
 
 Delete Event (Organizer)
 - DELETE /api/events/:id
 
+Request Header:
+{
+"Authorization": "Bearer token"
+}
+
+
 Bookings
 
-Create Booking (Attendee)
+Create Booking 
 - POST /api/events/:id/bookings
+
+Request Header:
+{
+"Authorization": "Bearer token"
+}
+
 
 Get My Bookings
 - GET /api/bookings
 
-Get a Bookings
+Request Header:
+{
+"Authorization": "Bearer token"
+}
+
+
+Get a Booking
 - GET /api/bookings/:id
 
-Delete a Bookings
+Request Header:
+{
+"Authorization": "Bearer token"
+}
+
+
+Delete a Booking
 - DELETE /api/bookings/:id
 
+Request Header:
+{
+"Authorization": "Bearer token"
+}
+
+
 Organizer dashboard
+- - GET /api/organizer/events
 - GET /api/organizer/events/:id
+
+Request Header:
+{
+"Authorization": "Bearer token"
+}
+
 
 Authentication & Authorization Flow
 1. User logs in and receives access + refresh tokens
@@ -116,11 +199,11 @@ Architecture
 Client → API Routes → Controllers → Services → Prisma ORM → Database
 
 Error Handling
-400 → Bad Request
-401 → Unauthorized
-403 → Forbidden
-404 → Not Found
-500 → Internal Server Error
+- 400 → Bad Request
+- 401 → Unauthorized
+- 403 → Forbidden
+- 404 → Not Found
+- 500 → Internal Server Error
 
 Technologies Used
 - Node.js / Next.js
@@ -130,9 +213,9 @@ Technologies Used
 - bcrypt
 
 Project Structure
-/app/api
-/prisma
-/utils
+- /app/api
+- /prisma
+- /utils
 
 Security
 - Password hashing
