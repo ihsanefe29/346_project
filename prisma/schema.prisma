@@ -1,0 +1,56 @@
+//https://odtuclass2025s.metu.edu.tr/mod/resource/view.php?id=65069
+
+generator client {
+  provider = "prisma-client-js"
+  output   = "./generated"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = "file:./dev.db"
+}
+
+model User {
+  id            Int     @id @default(autoincrement())
+  username      String  @unique
+  password      String
+  email         String
+  name          String?
+  role          String
+  refresh_token String?
+
+  events   Event[]   @relation("OrganizerEvent")
+  bookings Booking[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([email, role]) //person can be a orginizer later with different email
+}
+
+model Event {
+  id          Int      @id @default(autoincrement())
+  title       String
+  description String
+  dateTime    DateTime
+  capacity    Int
+
+  organizerId Int
+  organizer   User      @relation("OrganizerEvent", fields: [organizerId], references: [id], onDelete: Cascade)
+  bookings    Booking[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Booking {
+  id        Int      @id @default(autoincrement())
+  userId    Int
+  eventId   Int
+  createdAt DateTime @default(now())
+
+  user  User  @relation(fields: [userId], references: [id], onDelete: Cascade)
+  event Event @relation(fields: [eventId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, eventId]) // in order to prevent overbooking
+}
