@@ -16,28 +16,27 @@ Features
 Setup Instructions
 
 1. Clone Repository
-git clone <repo-link>
-cd <project-folder>
+- git clone <repo-link>
+- cd <project-folder>
 
 2. Install Dependencies
-npm install
+- npm install
 
-3. Environment Variables
-Create a .env file in the root directory:
+3. Environment Variables: Create a .env file in the root directory:
 
-DATABASE_URL="file:./dev.db"
-JWT_SECRET="your_secret_key"
-REFRESH_SECRET="..."
+- DATABASE_URL="file:./dev.db"
+- JWT_SECRET="your_secret_key"
+-REFRESH_SECRET="..."
 
 4. Database Setup (Prisma)
-npx prisma migrate dev
-npx prisma generate
+- npx prisma migrate dev
+- npx prisma generate
 
 5. Seed Database
-node prisma/seed.js
+- node prisma/seed.js
 
 6. Run Application
-npm run dev
+- npm run dev
 
 Server runs on:
 http://localhost:3000
@@ -47,7 +46,7 @@ API Documentation
 Authentication
 
 Register
-POST /api/users/signup
+- POST /api/users/signup
 
 Request Body:
 {
@@ -58,7 +57,7 @@ Request Body:
 }
 
 Login
-POST /api/users/login
+- POST /api/users/login
 
 Response:
 {
@@ -67,44 +66,44 @@ Response:
 }
 
 Check auth
-GET /api/users
+- GET /api/users
 
 Get new access token
-POST /api/users
+- POST /api/users
 
 Events
 
 Create Event (Organizer)
-POST /api/events
+- POST /api/events
 
 Get All Events
-GET /api/events
+- GET /api/events
 
 Get Event by ID
-GET /api/events/:id
+- GET /api/events/:id
 
 Update Event (Organizer)
-PUT /api/events/:id
+- PUSH /api/events/:id
 
 Delete Event (Organizer)
-DELETE /api/events/:id
+- DELETE /api/events/:id
 
 Bookings
 
 Create Booking (Attendee)
-POST /api/events/:id/bookings
+- POST /api/events/:id/bookings
 
 Get My Bookings
-GET /api/bookings
+- GET /api/bookings
 
 Get a Bookings
-GET /api/bookings/:id
+- GET /api/bookings/:id
 
 Delete a Bookings
-DELETE /api/bookings/:id
+- DELETE /api/bookings/:id
 
 Organizer dashboard
-GET /api/organizer/events/:id
+- GET /api/organizer/events/:id
 
 Authentication & Authorization Flow
 1. User logs in and receives access + refresh tokens
