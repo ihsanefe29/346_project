@@ -47,7 +47,7 @@ export async function POST(request,{params}) {
         if (existingBooking) {
             return NextResponse.json({ error: "Already booked" }, { status: 400 });
         }
-        console.log(responseData.user.userId);
+
        const booking = await prisma.booking.create({
             data: {
                 userId: responseData.user.userId,

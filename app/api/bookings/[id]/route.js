@@ -1,7 +1,6 @@
 import {prisma} from "../../../../prisma/db";
 import {NextResponse} from "next/server";
 import {helper} from "../../../../utils/Helper";
-import {console} from "next/dist/compiled/@edge-runtime/primitives";
 import {GET as userRoute} from "../../users/route";
 
 export async function GET(request,{params}) {

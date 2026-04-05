@@ -8,7 +8,6 @@ export async function GET(request,{params}) {
         const response = await userRoute(request);
         const {id} = await params;
 
-
         if(response.status !== 200){
             return response;
         }
@@ -22,7 +21,6 @@ export async function GET(request,{params}) {
         if(isNaN(eventId)){
             return NextResponse.json({error: "Invalid event"}, {status: 400});
         }
-
 
         const event = await prisma.event.findUnique({
             where: { id: eventId },
