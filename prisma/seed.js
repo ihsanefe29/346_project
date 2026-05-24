@@ -1,6 +1,6 @@
 //Whole script generated via ChatGPT
 
-const { PrismaClient } = require("./generated");
+const { PrismaClient } = require("@prisma/client");
 const bcrypt = require("bcrypt");
 
 const prisma = new PrismaClient();

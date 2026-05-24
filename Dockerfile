@@ -1,50 +1,21 @@
-# ── Stage 1: Install dependencies ────────────────────────────────────────────
-FROM node:20-alpine AS deps
-WORKDIR /app
+FROM node:20-bookworm-slim
 
-COPY package.json package-lock.json ./
-RUN npm ci --omit=dev
-
-# ── Stage 2: Build the Next.js app ───────────────────────────────────────────
-FROM node:20-alpine AS builder
-WORKDIR /app
-
-COPY package.json package-lock.json ./
-RUN npm ci
-
-COPY . .
-
-# Generate Prisma client for linux (the build host may be Windows/Mac)
-RUN npx prisma generate
-ENV JWT_SECRET=temporary_secret_for_build
-ENV REFRESH_SECRET=temporary_refresh_secret
-RUN npm run build
-
-# ── Stage 3: Production image ─────────────────────────────────────────────────
-FROM node:20-alpine AS runner
 WORKDIR /app
 
 ENV NODE_ENV=production
 
-# Create a non-root user for security
-RUN addgroup --system --gid 1001 nodejs && \
-    adduser  --system --uid 1001 nextjs
+RUN apt-get update && apt-get install -y openssl ca-certificates \
+    && rm -rf /var/lib/apt/lists/*
 
-# Copy only what is needed to run
+COPY package*.json ./
+RUN npm install
 
-COPY --from=builder /app/.next/standalone ./
-COPY --from=builder /app/.next/static    ./.next/static
-COPY --from=builder /app/prisma          ./prisma
-COPY --from=builder /app/node_modules/.prisma ./node_modules/.prisma
+COPY prisma ./prisma
+RUN npx prisma generate
 
-# The SQLite database file lives here; mount a volume to persist it
-RUN mkdir -p /app/prisma && chown -R nextjs:nodejs /app/prisma
-
-USER nextjs
+COPY . .
+RUN npm run build
 
 EXPOSE 3000
-ENV PORT=3000
-ENV HOSTNAME="0.0.0.0"
 
-# Apply any pending migrations then start the server
-CMD ["node", "server.js"]
+CMD ["npm", "start"]

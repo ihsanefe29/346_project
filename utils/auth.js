@@ -4,14 +4,25 @@ import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 
 const SALT_ROUNDS = 10;
-const JWT_SECRET = process.env.JWT_SECRET;
-const REFRESH_SECRET = process.env.REFRESH_SECRET;
 
-if (!JWT_SECRET) {
-    throw new Error("JWT_SECRET is not defined in environment variables!");
+function getJwtSecret() {
+    const secret = process.env.JWT_SECRET;
+
+    if (!secret) {
+        throw new Error("JWT_SECRET is not defined in environment variables!");
+    }
+
+    return secret;
 }
-if (!REFRESH_SECRET) {
-    throw new Error("REFRESH_SECRET is not defined in environment variables!");
+
+function getRefreshSecret() {
+    const secret = process.env.REFRESH_SECRET;
+
+    if (!secret) {
+        throw new Error("REFRESH_SECRET is not defined in environment variables!");
+    }
+
+    return secret;
 }
 
 export async function hashPassword(password) {
@@ -23,16 +34,16 @@ export async function comparePassword(password, hashedPassword) {
 }
 
 export function generateToken(payload) {
-    return jwt.sign(payload, JWT_SECRET, { expiresIn: "1h" });
+    return jwt.sign(payload, getJwtSecret(), { expiresIn: "1h" });
 }
 
 export function generateRefreshToken(payload) {
-    return jwt.sign(payload, REFRESH_SECRET, { expiresIn: "15d" });
+    return jwt.sign(payload, getRefreshSecret(), { expiresIn: "15d" });
 }
 
 export function verifyToken(token) {
     try {
-        return jwt.verify(token, JWT_SECRET);
+        return jwt.verify(token, getJwtSecret());
     } catch {
         return null;
     }
@@ -40,7 +51,7 @@ export function verifyToken(token) {
 
 export function verifyRefreshToken(token) {
     try {
-        return jwt.verify(token, REFRESH_SECRET);
+        return jwt.verify(token, getRefreshSecret());
     } catch {
         return null;
     }
