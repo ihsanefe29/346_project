@@ -5,11 +5,13 @@ import jwt from "jsonwebtoken";
 
 const SALT_ROUNDS = 10;
 const JWT_SECRET = process.env.JWT_SECRET;
-const REFRESH_SECRET = process.env.REFRESH_SECRET
-
+const REFRESH_SECRET = process.env.REFRESH_SECRET;
 
 if (!JWT_SECRET) {
-    throw new Error("JWT_SECRET is not defined!");
+    throw new Error("JWT_SECRET is not defined in environment variables!");
+}
+if (!REFRESH_SECRET) {
+    throw new Error("REFRESH_SECRET is not defined in environment variables!");
 }
 
 export async function hashPassword(password) {
@@ -23,6 +25,7 @@ export async function comparePassword(password, hashedPassword) {
 export function generateToken(payload) {
     return jwt.sign(payload, JWT_SECRET, { expiresIn: "1h" });
 }
+
 export function generateRefreshToken(payload) {
     return jwt.sign(payload, REFRESH_SECRET, { expiresIn: "15d" });
 }
@@ -30,7 +33,7 @@ export function generateRefreshToken(payload) {
 export function verifyToken(token) {
     try {
         return jwt.verify(token, JWT_SECRET);
-    } catch (error) {
+    } catch {
         return null;
     }
 }
@@ -38,7 +41,7 @@ export function verifyToken(token) {
 export function verifyRefreshToken(token) {
     try {
         return jwt.verify(token, REFRESH_SECRET);
-    } catch (error) {
+    } catch {
         return null;
     }
 }

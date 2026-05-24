@@ -1,53 +1,59 @@
 import { prisma } from "../../../../prisma/db";
-import {hashPassword} from "../../../../utils/auth";
+import { hashPassword } from "../../../../utils/auth";
 import { NextResponse } from "next/server";
-import {Role} from "../../../../utils/roles";
-import {helper} from "../../../../utils/Helper";
+import { Role } from "../../../../utils/roles";
+import { helper } from "../../../../utils/Helper";
 
 export async function POST(request) {
-
     try {
-        const {username, name, email, password, role} = await request.json();
+        const { username, name, email, password, role } = await request.json();
 
         if (!username || !name || !email || !password || !role) {
             return NextResponse.json(
-                {error: "Empty field exist"},
-                {status: 400}
+                { error: "All fields are required" },
+                { status: 400 }
             );
         }
 
-        if (!Object.values(Role).includes(role)) {
+        // Role must be one of the defined roles
+        if (!Object.values(Role).includes(role.toUpperCase())) {
             return NextResponse.json(
-                {error: "Invalid role"},
-                {status: 400}
+                { error: "Invalid role" },
+                { status: 400 }
             );
         }
 
         if (password.length < 8) {
             return NextResponse.json(
-                {error: "Password must be at least 8 characters"},
-                {status: 400}
-            );
-        }
-        var existingUser = await prisma.user.findUnique({where: {username: username}})
-
-        if(existingUser) {
-            return NextResponse.json(
-                {error: "Username already exists"},
-                {status: 400}
+                { error: "Password must be at least 8 characters" },
+                { status: 400 }
             );
         }
 
-        const users = await prisma.user.findMany();
-
-        existingUser = await prisma.user.findUnique(
-            {where: {email_role: {email:email, role: role}}}
-        )
-
-        if(existingUser){
+        // Basic email format check
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!emailRegex.test(email)) {
             return NextResponse.json(
-                {error: "Already exists in the database as " + role},
-                {status: 409}
+                { error: "Invalid email format" },
+                { status: 400 }
+            );
+        }
+
+        const existingUsername = await prisma.user.findUnique({ where: { username } });
+        if (existingUsername) {
+            return NextResponse.json(
+                { error: "Username already exists" },
+                { status: 409 }
+            );
+        }
+
+        const existingUser = await prisma.user.findUnique({
+            where: { email_role: { email, role: role.toUpperCase() } }
+        });
+        if (existingUser) {
+            return NextResponse.json(
+                { error: "An account with this email already exists as " + role },
+                { status: 409 }
             );
         }
 
@@ -57,7 +63,7 @@ export async function POST(request) {
                 name,
                 email,
                 password: await hashPassword(password),
-                role,
+                role: role.toUpperCase(),
             },
             select: {
                 username: true,
@@ -67,9 +73,8 @@ export async function POST(request) {
             },
         });
 
-        return NextResponse.json(user, {status:200});
+        return NextResponse.json(user, { status: 201 });
+    } catch (error) {
+        return helper.errors.INTERNAL_SERVER_ERROR(error);
     }
-    catch (error) {
-
-        return helper.errors.INTERNAL_SERVER_ERROR(error);}
 }

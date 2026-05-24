@@ -1,224 +1,313 @@
-#  Adapted from: ChatGPT response to the question "Create the README.txt file with the full content"
-Project Description
-This project implements a backend system for an Event Booking & Ticketing Platform. The system allows organizers to create, update, and delete events, while attendees can view events and book tickets. It includes secure authentication, role-based authorization, and prevents overbooking by validating event capacity.
+# SNG346 — Event Booking & Ticketing System
 
-Features
-- RESTful API design
-- JWT Authentication (Access Token + Refresh Token)
-- Role-Based Access Control (Organizer / Attendee)
-- Event management (CRUD)
-- Booking system with capacity validation
-- Input validation
-- Error handling with proper HTTP status codes
-- Prisma ORM with relational database
-- Seed script for test data
+**Option 2** from the SNG346 Web Application Development semester project.
 
-Setup Instructions
+A full-stack web application built with Next.js, Prisma ORM, and SQLite. Organisers can create and manage events; attendees can discover and book tickets. Tokens are stored in `HttpOnly` cookies (not `localStorage`) to prevent XSS-based token theft.
 
-1. Clone Repository
-- git clone <repo-link>
-- cd <project-folder>
+---
 
-2. Install Dependencies
-- npm install
+## Team
 
-3. Environment Variables: Create a .env file in the root directory:
+| Student ID | Name |
+|------------|------|
+| _(fill in)_ | _(fill in)_ |
 
-- DATABASE_URL="file:./dev.db"
-- JWT_SECRET="your_secret_key"
-- REFRESH_SECRET="..."
+---
 
-4. Database Setup (Prisma)
-- npx prisma migrate dev
-- npx prisma generate
+## Setup Instructions
 
-5. Seed Database
-- node prisma/seed.js
+### Prerequisites
 
-6. Run Application
-- npm run dev
+- Node.js v18+
+- npm
 
-Server runs on:
-http://localhost:3000
+### 1. Clone the repository
 
-API Documentation
+```bash
+git clone <repo-url>
+cd 346
+```
 
-Authentication
+### 2. Install dependencies
 
-Register
-- POST /api/users/signup
+```bash
+npm install
+```
 
-Request Body:
-{
-  "username": "user1",
-  "name": "user",
-  "email": "user@test.com",
-  "password": "12345678",
-  "role": "ATTENDEE"
-}
+### 3. Configure environment variables
 
-Login
-- POST /api/users/login
-Request Body:
-  {
-  "username": "user1",
-  "password": "12345678"
-  }
+Copy the provided `.env` file or create one in the project root:
 
-Response:
-{
-  "token": "token",
-  "refresh_token": "token"
-}
+```env
+DATABASE_URL="file:./dev.db"
+JWT_SECRET="replace_with_a_strong_random_secret"
+REFRESH_SECRET="replace_with_a_different_strong_random_secret"
+NODE_ENV="development"
+```
 
-Check auth
-- GET /api/users
+> ⚠️ **Never commit real secrets.** Generate safe values with:
+> ```bash
+> node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"
+> ```
 
-Request Header:
-  {
-  "Authorization": "Bearer token"
-  }
+### 4. Apply database migrations
 
+```bash
+npx prisma migrate dev
+npx prisma generate
+```
 
-Get new access token
-- POST /api/users
+### 5. Seed the database
 
-Request Header:
-{
-"Authorization": "Bearer refresh_token"
-}
+```bash
+node prisma/seed.js
+```
 
+This creates the following test accounts (all passwords: **Seed1234**):
 
-Events
+| Role | Username |
+|------|----------|
+| ORGANIZER | organizer1 |
+| ORGANIZER | organizer2 |
+| ATTENDEE | attendee1 |
+| ATTENDEE | attendee2 |
+| ATTENDEE | attendee3 |
+| ATTENDEE | attendee4 |
 
-Create Event (Organizer)
-- POST /api/events
+### 6. Run the development server
 
-Request Header:
-{
-"Authorization": "Bearer token"
-}
+```bash
+npm run dev
+```
 
-Request Body:
-{
-"title": "Fall Concert",
-"description": "Live music on campus",
-"dateTime": "09/15/2019",
-"capacity": 500
-}
+App is available at **http://localhost:3000**
 
+---
 
-Get All Events
-- GET /api/events
+## Deployment (Docker)
 
-Get Event by ID
-- GET /api/events/:id
+```bash
+docker build -t sng346-app .
+docker run -p 3000:3000 --env-file .env sng346-app
+```
 
-Update Event (Organizer)
-- POST /api/events/:id
+---
 
-Request Header:
-{
-"Authorization": "Bearer token"
-}
+## Project Structure
 
-Request Body:
-{
-"title": "Fall Concert",
-"description": "Live music on campus",
-"dateTime": "09/15/2019",
-"capacity": 500
-}
+```
+346/
+├── app/
+│   ├── api/
+│   │   ├── users/
+│   │   │   ├── login/route.js      # POST — login, sets HttpOnly cookies
+│   │   │   ├── logout/route.js     # POST — clears auth cookies
+│   │   │   ├── signup/route.js     # POST — register new user
+│   │   │   └── route.js            # GET — verify token | POST — refresh token
+│   │   ├── events/
+│   │   │   ├── route.js            # GET all events | POST create event
+│   │   │   └── [id]/
+│   │   │       ├── route.js        # GET | POST (update) | DELETE event
+│   │   │       └── bookings/
+│   │   │           └── route.js    # POST — book an event
+│   │   ├── bookings/
+│   │   │   ├── route.js            # GET — my bookings
+│   │   │   └── [id]/route.js       # GET | DELETE a booking
+│   │   └── organizer/
+│   │       └── events/
+│   │           ├── route.js        # GET — organizer's own events
+│   │           └── [id]/route.js   # GET — event detail with attendee list
+│   ├── components/
+│   │   ├── Login.tsx
+│   │   ├── Register.tsx
+│   │   ├── EventsPage.tsx
+│   │   ├── OrganiserDashboard.tsx
+│   │   ├── MyBookings.tsx
+│   │   └── EventForm.tsx
+│   ├── App.tsx
+│   └── page.js
+├── prisma/
+│   ├── schema.prisma
+│   ├── seed.js
+│   ├── db.js
+│   └── migrations/
+├── utils/
+│   ├── auth.js          # bcrypt, JWT helpers
+│   ├── roles.js         # Role enum
+│   └── Helper.js        # Shared error response helper
+├── middleware.js         # Rate limiter (applied to /api/users/*)
+└── .env
+```
 
+---
 
-Delete Event (Organizer)
-- DELETE /api/events/:id
+## Architecture
 
-Request Header:
-{
-"Authorization": "Bearer token"
-}
+```
+Browser (React/Next.js)
+        │  fetch(..., { credentials: 'include' })
+        ▼
+Next.js API Routes (app/api/)
+        │
+        ├─ middleware.js  ← rate limiting on /api/users/*
+        │
+        ├─ auth check via verifyToken() (reads HttpOnly cookie)
+        │
+        ▼
+Prisma ORM  →  SQLite (dev.db)
+```
 
+---
 
-Bookings
+## Authentication & Token Flow
 
-Create Booking 
-- POST /api/events/:id/bookings
+1. **Login** (`POST /api/users/login`): credentials verified with bcrypt; access token (1 h) and refresh token (15 d) are set as `HttpOnly`, `SameSite=Strict` cookies. No tokens are ever sent to JavaScript.
+2. **Authenticated requests**: the browser automatically includes the `token` cookie. The API route reads it via `request.cookies`.
+3. **Token refresh** (`POST /api/users`): reads the `refresh_token` cookie, validates it against the stored value in the database, and issues a new access token cookie.
+4. **Logout** (`POST /api/users/logout`): server clears both cookies by setting `maxAge=0`.
 
-Request Header:
-{
-"Authorization": "Bearer token"
-}
+> **Why cookies instead of `localStorage`?** `localStorage` is accessible by any JavaScript on the page, making tokens vulnerable to XSS attacks. `HttpOnly` cookies cannot be read by JavaScript at all — the browser sends them automatically and only over HTTPS in production.
 
+---
 
-Get My Bookings
-- GET /api/bookings
+## API Documentation
 
-Request Header:
-{
-"Authorization": "Bearer token"
-}
+All endpoints that require authentication read the `token` cookie automatically. For direct API testing (e.g., Postman/cURL), you can also pass `Authorization: Bearer <token>` as a header.
 
+### Auth
 
-Get a Booking
-- GET /api/bookings/:id
+| Method | Endpoint | Auth | Description |
+|--------|----------|------|-------------|
+| POST | `/api/users/signup` | — | Register a new user |
+| POST | `/api/users/login` | — | Login, sets auth cookies |
+| GET | `/api/users` | ✓ | Verify token, return user info |
+| POST | `/api/users` | ✓ (refresh cookie) | Refresh access token |
+| POST | `/api/users/logout` | — | Clear auth cookies |
 
-Request Header:
-{
-"Authorization": "Bearer token"
-}
+#### POST `/api/users/signup`
+```json
+// Request body
+{ "username": "alice", "name": "Alice Smith", "email": "alice@example.com", "password": "MyPass123", "role": "ATTENDEE" }
 
+// 201 Response
+{ "username": "alice", "name": "Alice Smith", "email": "alice@example.com", "role": "ATTENDEE" }
+```
 
-Delete a Booking
-- DELETE /api/bookings/:id
+#### POST `/api/users/login`
+```json
+// Request body
+{ "username": "alice", "password": "MyPass123" }
 
-Request Header:
-{
-"Authorization": "Bearer token"
-}
+// 200 Response (tokens delivered as HttpOnly cookies, not in body)
+{ "user": { "id": "1", "username": "alice", "role": "attendee" } }
+```
 
+---
 
-Organizer dashboard
-- - GET /api/organizer/events
-- GET /api/organizer/events/:id
+### Events
 
-Request Header:
-{
-"Authorization": "Bearer token"
-}
+| Method | Endpoint | Auth | Role | Description |
+|--------|----------|------|------|-------------|
+| GET | `/api/events` | — | Any | List all events with booking counts |
+| POST | `/api/events` | ✓ | ORGANIZER | Create a new event |
+| GET | `/api/events/:id` | — | Any | Get a single event |
+| POST | `/api/events/:id` | ✓ | ORGANIZER (owner) | Update an event |
+| DELETE | `/api/events/:id` | ✓ | ORGANIZER (owner) | Delete an event and its bookings |
 
+#### POST `/api/events` — Create Event
+```json
+// Request body
+{ "title": "Tech Talk 2026", "description": "Panel discussion on AI.", "dateTime": "2026-09-15T18:00:00Z", "capacity": 100 }
+```
 
-Authentication & Authorization Flow
-1. User logs in and receives access + refresh tokens
-2. Access token is sent in header:
-Authorization: Bearer <token>
-3. Middleware verifies token
-4. Role-based authorization is applied
+---
 
-Architecture
-Client → API Routes → Controllers → Services → Prisma ORM → Database
+### Bookings
 
-Error Handling
-- 400 → Bad Request
-- 401 → Unauthorized
-- 403 → Forbidden
-- 404 → Not Found
-- 500 → Internal Server Error
+| Method | Endpoint | Auth | Role | Description |
+|--------|----------|------|------|-------------|
+| POST | `/api/events/:id/bookings` | ✓ | ATTENDEE | Book a ticket (capacity-checked, transactional) |
+| GET | `/api/bookings` | ✓ | Any | List my bookings |
+| GET | `/api/bookings/:id` | ✓ | Owner | Get a specific booking |
+| DELETE | `/api/bookings/:id` | ✓ | Owner | Cancel a booking |
 
-Technologies Used
-- Node.js / Next.js
-- Prisma ORM
-- SQLite
-- JWT
-- bcrypt
+---
 
-Project Structure
-- /app/api
-- /prisma
-- /utils
+### Organiser Dashboard
 
-Security
-- Password hashing
-- JWT authentication
-- Role-based authorization
-- Input validation
+| Method | Endpoint | Auth | Role | Description |
+|--------|----------|------|------|-------------|
+| GET | `/api/organizer/events` | ✓ | ORGANIZER | All own events with booking lists |
+| GET | `/api/organizer/events/:id` | ✓ | ORGANIZER (owner) | Event detail: sold tickets + attendee list |
+
+---
+
+## Data Model
+
+```
+User
+  id, username (unique), name, email, password (hashed), role, refresh_token
+  ├── events[]     (as organizer)
+  └── bookings[]
+
+Event
+  id, title, description, dateTime, capacity, organizerId
+  └── bookings[]
+
+Booking
+  id, userId, eventId, createdAt
+  @@unique([userId, eventId])   ← prevents duplicate bookings
+```
+
+---
+
+## Security Measures
+
+| Measure | Implementation |
+|---------|---------------|
+| Password hashing | bcrypt with 10 salt rounds (`bcryptjs`) |
+| Token storage | `HttpOnly` + `SameSite=Strict` cookies (not `localStorage`) |
+| JWT secrets | Loaded from environment variables; validated at startup |
+| Token payload | Only `userId`, `username`, `role` — no sensitive data |
+| Role-based access | Checked on every protected route |
+| Overbooking prevention | Prisma interactive transaction (atomic check + insert) |
+| Rate limiting | `middleware.js` on `/api/users/*` — 10 req / 5 min per IP |
+| Input validation | All required fields checked; email format validated; capacity > 0 |
+| Cascade deletes | Bookings deleted when event or user is deleted (Prisma `onDelete: Cascade`) |
+
+---
+
+## Bonus Features Implemented
+
+- **Advanced search & filtering** — events searchable by title/description; filterable by upcoming/past
+- **Pagination** — both EventsPage and OrganiserDashboard paginate results
+- **Rate limiting** — IP-based rate limiter in `middleware.js`
+
+---
+
+## HTTP Status Codes Used
+
+| Code | Meaning |
+|------|---------|
+| 200 | OK |
+| 201 | Created |
+| 400 | Bad Request (validation error) |
+| 401 | Unauthorized (missing/invalid token) |
+| 403 | Forbidden (wrong role or not the owner) |
+| 404 | Not Found |
+| 409 | Conflict (duplicate username/email) |
+| 429 | Too Many Requests (rate limited) |
+| 500 | Internal Server Error |
+
+---
+
+## Citations
+
+All external sources are cited inline in the relevant files as comments. Summary:
+
+- `utils/auth.js` — adapted from course material (METU ODTUClass)
+- `prisma/seed.js` — generated via ChatGPT
+- `app/api/events/[id]/bookings/route.js` — overbooking check pattern suggested by ChatGPT
+- `app/api/organizer/events/[id]/route.js` — Prisma nested include generated by ChatGPT
+- `utils/roles.js` — `Object.freeze` pattern from Reddit discussion
+- Date validation — FreeCodeCamp article on JS date validation

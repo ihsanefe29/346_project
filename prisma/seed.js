@@ -11,7 +11,7 @@ async function main() {
     await prisma.event.deleteMany();
     await prisma.user.deleteMany();
 
-    const hashedPassword = await bcrypt.hash("123456", 10);
+    const hashedPassword = await bcrypt.hash("Seed1234", 10);
 
     // Users
     const organizer1 = await prisma.user.create({
@@ -167,12 +167,12 @@ async function main() {
 
     console.log("Seed completed successfully.");
     console.log("Users created:");
-    console.log("ORGANIZER -> organizer1 / 123456");
-    console.log("ORGANIZER -> organizer2 / 123456");
-    console.log("ATTENDEE  -> attendee1 / 123456");
-    console.log("ATTENDEE  -> attendee2 / 123456");
-    console.log("ATTENDEE  -> attendee3 / 123456");
-    console.log("ATTENDEE  -> attendee4 / 123456");
+    console.log("ORGANIZER -> organizer1 / Seed1234");
+    console.log("ORGANIZER -> organizer2 / Seed1234");
+    console.log("ATTENDEE  -> attendee1 / Seed1234");
+    console.log("ATTENDEE  -> attendee2 / Seed1234");
+    console.log("ATTENDEE  -> attendee3 / Seed1234");
+    console.log("ATTENDEE  -> attendee4 / Seed1234");
     console.log("Events created:");
     console.log(`- ${event1.title} (full: 3/3)`);
     console.log(`- ${event2.title} (1/2)`);
