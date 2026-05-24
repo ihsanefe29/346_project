@@ -3,7 +3,6 @@ import { NextResponse } from "next/server";
 import { helper } from "../../../../utils/Helper";
 import { GET as userRoute } from "../../users/route";
 
-// Authenticated (owner only): get a single booking
 export async function GET(request, { params }) {
     try {
         const response = await userRoute(request);
@@ -18,7 +17,7 @@ export async function GET(request, { params }) {
         }
 
         const booking = await prisma.booking.findUnique({
-            where: { id: bookingId },
+            where: { id: bookingId,userId: parseInt(responseData.user.userId), },
             select: {
                 id: true,
                 eventId: true,
@@ -36,19 +35,9 @@ export async function GET(request, { params }) {
         });
 
         if (!booking) {
-            return NextResponse.json({ error: "Booking not found" }, { status: 404 });
+            return NextResponse.json({ error: "No such booking not found for the owner." }, { status: 404 });
         }
 
-        // Ownership check: must re-fetch with userId to verify — userId intentionally
-        // not included in the select above to avoid leaking it in the response
-        const bookingOwner = await prisma.booking.findUnique({
-            where: { id: bookingId },
-            select: { userId: true },
-        });
-
-        if (parseInt(responseData.user.userId) !== bookingOwner.userId) {
-            return NextResponse.json({ error: "Forbidden" }, { status: 403 });
-        }
 
         return NextResponse.json(booking, { status: 200 });
     } catch (error) {
@@ -72,16 +61,12 @@ export async function DELETE(request, { params }) {
 
         // Fetch only the userId for the ownership check — never expose it in the response
         const booking = await prisma.booking.findUnique({
-            where: { id: bookingId },
+            where: { id: bookingId, userId: userId, },
             select: { id: true, userId: true, eventId: true },
         });
 
         if (!booking) {
-            return NextResponse.json({ error: "Booking not found" }, { status: 404 });
-        }
-
-        if (parseInt(responseData.user.userId) !== booking.userId) {
-            return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+            return NextResponse.json({ error: "No such booking not found for the owner." }, { status: 404 });
         }
 
         await prisma.booking.delete({ where: { id: bookingId } });

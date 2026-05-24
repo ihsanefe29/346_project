@@ -46,7 +46,6 @@ export default function Register({ onRegister, onSwitchToLogin }: RegisterProps)
         throw new Error(data.error || 'Registration failed. Please try again.');
       }
 
-      // Automatically log in after successful registration
       const loginRes = await fetch('/api/users/login', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -56,7 +55,6 @@ export default function Register({ onRegister, onSwitchToLogin }: RegisterProps)
       const loginData = await loginRes.json();
 
       if (!loginRes.ok) {
-        // Registration succeeded but auto-login failed — redirect to login
         onSwitchToLogin();
         return;
       }
@@ -162,7 +160,7 @@ export default function Register({ onRegister, onSwitchToLogin }: RegisterProps)
                   onChange={() => setRole('ATTENDEE')}
                   className="mr-2"
                 />
-                Attendee (Book tickets)
+                Attendee
               </label>
               <label className="flex items-center">
                 <input
@@ -173,7 +171,7 @@ export default function Register({ onRegister, onSwitchToLogin }: RegisterProps)
                   onChange={() => setRole('ORGANIZER')}
                   className="mr-2"
                 />
-                Organiser (Create events)
+                Organiser
               </label>
             </div>
           </div>

@@ -3,7 +3,7 @@ import { prisma } from "../../../../../prisma/db";
 import { helper } from "../../../../../utils/Helper";
 import { GET as userRoute } from "../../../users/route";
 
-// ORGANIZER (owner only): get event detail with sold-ticket count and attendee list
+
 export async function GET(request, { params }) {
     try {
         const response = await userRoute(request);
@@ -21,8 +21,6 @@ export async function GET(request, { params }) {
             return NextResponse.json({ error: "Invalid event ID" }, { status: 400 });
         }
 
-        // Fetch a lightweight row first for the ownership check —
-        // avoids running the expensive nested include for unauthorised requests
         const eventOwner = await prisma.event.findUnique({
             where: { id: eventId },
             select: { organizerId: true },
@@ -36,8 +34,6 @@ export async function GET(request, { params }) {
             return NextResponse.json({ error: "Forbidden: you do not own this event" }, { status: 403 });
         }
 
-        // Now safe to fetch full detail — user fields are whitelisted, no password/refresh_token leak
-        // Generated with ChatGPT assistance
         const event = await prisma.event.findUnique({
             where: { id: eventId },
             select: {

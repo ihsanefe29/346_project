@@ -104,7 +104,6 @@ export default function OrganiserDashboard({ user, onNavigate, onLogout }: Organ
 
       if (!response.ok) throw new Error(formatError(data, 'Failed to load attendee list'));
 
-      // API returns { event, ticketsSold, ticketsRemaining, attendees }
       const attendees: Booking[] = (data.attendees || []).map((a: any) => ({
         id: a.bookingId,
         eventId,

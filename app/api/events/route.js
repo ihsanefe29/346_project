@@ -26,7 +26,6 @@ export async function GET() {
     }
 }
 
-// ORGANIZER only: create an event
 export async function POST(request) {
     try {
         const response = await userRoute(request);

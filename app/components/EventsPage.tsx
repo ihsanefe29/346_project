@@ -35,7 +35,7 @@ export default function EventsPage({ user, onNavigate, onLogout }: EventsPagePro
   const [searchTerm, setSearchTerm] = useState('');
   const [filterDate, setFilterDate] = useState<'all' | 'upcoming' | 'past'>('all');
   const [currentPage, setCurrentPage] = useState(1);
-  const [itemsPerPage, setItemsPerPage] = useState(10);
+  const [itemsPerPage, setItemsPerPage] = useState(6);
   const [loading, setLoading] = useState<string | null>(null);
   const [error, setError] = useState('');
 

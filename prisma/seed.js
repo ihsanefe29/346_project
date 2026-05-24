@@ -79,7 +79,7 @@ async function main() {
         data: {
             title: "Spring Music Festival",
             description: "Open-air campus music event.",
-            dateTime: new Date("2026-04-20T18:00:00.000Z"),
+            dateTime: new Date("2026-06-20T18:00:00.000Z"),
             capacity: 3,
             organizerId: organizer1.id,
         },
@@ -89,7 +89,7 @@ async function main() {
         data: {
             title: "Tech Career Talk",
             description: "Industry professionals share career advice.",
-            dateTime: new Date("2026-04-25T14:00:00.000Z"),
+            dateTime: new Date("2026-06-25T14:00:00.000Z"),
             capacity: 2,
             organizerId: organizer1.id,
         },
@@ -99,7 +99,7 @@ async function main() {
         data: {
             title: "Startup Networking Night",
             description: "Meet founders, investors, and students.",
-            dateTime: new Date("2026-05-02T17:30:00.000Z"),
+            dateTime: new Date("2026-04-02T17:30:00.000Z"),
             capacity: 4,
             organizerId: organizer2.id,
         },
@@ -109,7 +109,7 @@ async function main() {
         data: {
             title: "Empty Test Event",
             description: "No one has booked this yet.",
-            dateTime: new Date("2026-05-10T10:00:00.000Z"),
+            dateTime: new Date("2026-07-10T10:00:00.000Z"),
             capacity: 5,
             organizerId: organizer2.id,
         },

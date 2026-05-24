@@ -5,12 +5,19 @@ import { NextResponse } from "next/server";
 const requests = new Map();
 
 export function proxy(request) {
+    const pathname = request.nextUrl.pathname;
+
+
+    if (request.method === "GET" && pathname === "/api/users") {
+        return NextResponse.next();
+    }
+
     const ip =
         request.headers.get("x-forwarded-for")?.split(",")[0] ||
         "unknown";
 
     const now = Date.now();
-    const limit = 5;
+    const limit = 10;
     const windowMs = 5 * 60 * 1000;
 
     const user = requests.get(ip);

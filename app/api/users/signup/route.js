@@ -6,7 +6,13 @@ import { helper } from "../../../../utils/Helper";
 
 export async function POST(request) {
     try {
-        const { username, name, email, password, role } = await request.json();
+        const body = await request.json();
+
+        const username = body.username?.trim();
+        const password = body.password?.trim();
+        const name = body.name?.trim();
+        const  email = body.email?.trim();
+        const role = body.role;
 
         if (!username || !name || !email || !password || !role) {
             return NextResponse.json(
@@ -15,7 +21,6 @@ export async function POST(request) {
             );
         }
 
-        // Role must be one of the defined roles
         if (!Object.values(Role).includes(role.toUpperCase())) {
             return NextResponse.json(
                 { error: "Invalid role" },

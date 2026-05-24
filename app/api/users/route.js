@@ -25,7 +25,6 @@ function extractRefreshToken(request) {
     return null;
 }
 
-// GET /api/users — verify access token and return user info
 export async function GET(request) {
     try {
         const token = extractToken(request);
@@ -52,7 +51,6 @@ export async function GET(request) {
     }
 }
 
-// POST /api/users — refresh access token using refresh token cookie
 export async function POST(request) {
     try {
         const token = extractRefreshToken(request);
@@ -79,7 +77,6 @@ export async function POST(request) {
             return NextResponse.json({ error: "Refresh token does not match" }, { status: 403 });
         }
 
-        // Only include safe fields in token payload (never the full DB row)
         const newToken = generateToken({
             userId: auth_User.id,
             username: auth_User.username,

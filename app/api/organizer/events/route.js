@@ -3,7 +3,7 @@ import { prisma } from "../../../../prisma/db";
 import { NextResponse } from "next/server";
 import { GET as userRoute } from "../../users/route";
 
-// ORGANIZER only: list own events with attendee counts
+
 export async function GET(request) {
     try {
         const response = await userRoute(request);

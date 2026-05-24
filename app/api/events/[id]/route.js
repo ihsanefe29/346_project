@@ -3,7 +3,6 @@ import { NextResponse } from "next/server";
 import { helper } from "../../../../utils/Helper";
 import { GET as userRoute } from "../../users/route";
 
-// Public: get a single event — organizerId hidden
 export async function GET(request, { params }) {
     try {
         const { id } = await params;
@@ -36,7 +35,6 @@ export async function GET(request, { params }) {
     }
 }
 
-// ORGANIZER (owner only): update an event — using PUT for REST correctness
 export async function PUT(request, { params }) {
     try {
         const response = await userRoute(request);

@@ -32,8 +32,6 @@ export default function App() {
   const [currentPage, setCurrentPage] = useState<AppPage>('events');
   const [bootstrapping, setBootstrapping] = useState(true);
 
-  // On mount: silently check if a valid auth cookie already exists.
-  // GET /api/users reads the HttpOnly cookie and returns the user payload if valid.
   useEffect(() => {
     fetch('/api/users', { credentials: 'include' })
       .then(res => res.ok ? res.json() : null)
@@ -44,7 +42,6 @@ export default function App() {
       .finally(() => setBootstrapping(false));
   }, []);
 
-  // Don't flash the login screen while the cookie check is in flight
   if (bootstrapping) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-50">
@@ -64,7 +61,6 @@ export default function App() {
   };
 
   const handleLogout = async () => {
-    // Clear HttpOnly cookies via API (browser JS cannot clear HttpOnly cookies directly)
     await fetch('/api/users/logout', { method: 'POST', credentials: 'include' }).catch(() => {});
     setUser(null);
     setAuthView('login');

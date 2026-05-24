@@ -5,7 +5,10 @@ import { helper } from "../../../../utils/Helper";
 
 export async function POST(request) {
     try {
-        const { username, password } = await request.json();
+        const body = await request.json();
+
+        const username = body.username?.trim();
+        const password = body.password?.trim();
 
         if (!username || !password) {
             return NextResponse.json(

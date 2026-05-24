@@ -26,7 +26,6 @@ export default function Login({ onLogin, onSwitchToRegister }: LoginProps) {
       const response = await fetch('/api/users/login', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        // Tokens are now set as HttpOnly cookies by the server — no localStorage
         credentials: 'include',
         body: JSON.stringify({ username, password }),
       });
